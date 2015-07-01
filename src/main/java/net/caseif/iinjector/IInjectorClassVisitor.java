@@ -50,9 +50,11 @@ public class IInjectorClassVisitor extends ClassVisitor {
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        ArrayList<String> newInterfaces = new ArrayList<>();
-        newInterfaces.addAll(Arrays.asList(interfaces));
-        newInterfaces.addAll(this.interfaces);
-        writer.visit(version, access, name, signature, superName, (String[])newInterfaces.toArray());
+        ArrayList<String> interfaceList = new ArrayList<>();
+        interfaceList.addAll(Arrays.asList(interfaces));
+        interfaceList.addAll(this.interfaces);
+        String[] newInterfaces = new String[interfaceList.size()];
+        interfaceList.toArray(newInterfaces);
+        writer.visit(version, access, name, signature, superName, newInterfaces);
     }
 }

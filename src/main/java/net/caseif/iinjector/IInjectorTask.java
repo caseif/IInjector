@@ -29,6 +29,7 @@
 package net.caseif.iinjector;
 
 import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.jvm.tasks.Jar;
 
@@ -39,11 +40,9 @@ import java.io.File;
  */
 public class IInjectorTask extends Jar {
 
-    private String suffix = "-iinjected";
-
     private File config;
     private File inputJar;
-    File outputJar;
+    @Optional String outputFileName;
 
     public IInjectorTask() {
         doLast(new IInjectorAction());
@@ -61,7 +60,15 @@ public class IInjectorTask extends Jar {
 
     @OutputFile
     public File getOutputJar() {
-        return outputJar;
+        return new File(
+                outputFileName != null
+                ? outputFileName
+                : getInputJar().getPath()
+                        .replace(".jar", "" + (getClassifier() != null
+                                ? (!getClassifier().isEmpty() ? "-" : "") + getClassifier()
+                                : "-iinject"
+                        ) + ".jar")
+        );
     }
 
     public void setConfig(File configFile) {
@@ -70,10 +77,6 @@ public class IInjectorTask extends Jar {
 
     public void setInputJar(File inputFile) {
         this.inputJar = inputFile;
-    }
-
-    public String getSuffix() {
-        return this.suffix;
     }
 
 }

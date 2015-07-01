@@ -18,7 +18,7 @@ plugins {
 apply plugin: 'license'
 
 group = 'net.caseif.iinjector'
-version = '0.1.0-SNAPSHOT'
+version = '0.1.0'
 
 ext.projectName = 'iinjector'
 ext.description = 'A Gradle plugin enabling compile-time injection of interfaces into Java class bytecode.'

@@ -59,7 +59,6 @@ public class IInjectorAction implements Action<Task> {
     @Override
     public void execute(Task baseTask) {
         final IInjectorTask task = (IInjectorTask)baseTask;
-        task.outputJar = new File(task.getInputJar().getPath().replace(".jar", task.getClassifier() + ".jar"));
         constructInjectionMap(task);
         try (
                 FileInputStream jarIn = new FileInputStream(task.getInputJar());
@@ -71,10 +70,9 @@ public class IInjectorAction implements Action<Task> {
             ZipEntry zipEntry;
             while ((zipEntry = zipIn.getNextEntry()) != null) {
                 ZipEntry zipEntryOut = new ZipEntry(zipEntry);
-                String className = zipEntry.getName().substring(0, zipEntry.getName().length() - 6);
                 if (zipEntry.getName().endsWith(".class") && !zipEntry.isDirectory()
-                        && injections.containsKey(className)) {
-                    byte[] data = transform(zipIn, className);
+                        && injections.containsKey(zipEntry.getName().replace(".class", ""))) {
+                    byte[] data = transform(zipIn, zipEntry.getName().replace(".class", ""));
                     zipEntryOut.setSize(data.length);
                     zipEntryOut.setCompressedSize(-1);
                     zipOut.putNextEntry(zipEntryOut);
