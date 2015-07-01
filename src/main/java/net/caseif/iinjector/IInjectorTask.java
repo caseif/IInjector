@@ -39,11 +39,11 @@ import java.io.File;
  */
 public class IInjectorTask extends AbstractTask {
 
-    private static final String OUTPUT_SUFFIX = "-iinjected";
+    private String classifier = "-iinjected";
 
     private File config;
     private File inputJar;
-    private File outputJar;
+    File outputJar;
 
     public IInjectorTask() {
         doLast(new IInjectorAction());
@@ -70,9 +70,10 @@ public class IInjectorTask extends AbstractTask {
 
     public void setInputJar(File inputFile) {
         this.inputJar = inputFile;
-        if (outputJar == null) {
-            outputJar = new File(inputJar.getPath().replace(".jar", OUTPUT_SUFFIX + ".jar"));
-        }
+    }
+
+    public String getClassifier() {
+        return this.classifier;
     }
 
 }

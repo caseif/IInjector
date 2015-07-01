@@ -35,6 +35,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -58,6 +59,7 @@ public class IInjectorAction implements Action<Task> {
     @Override
     public void execute(Task baseTask) {
         final IInjectorTask task = (IInjectorTask)baseTask;
+        task.outputJar = new File(task.getInputJar().getPath().replace(".jar", task.getClassifier() + ".jar"));
         constructInjectionMap(task);
         try (
                 FileInputStream jarIn = new FileInputStream(task.getInputJar());
