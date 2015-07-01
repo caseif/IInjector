@@ -29,9 +29,50 @@
 package net.caseif.iinjector;
 
 import org.gradle.api.internal.AbstractTask;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.OutputFile;
+
+import java.io.File;
 
 /**
  * The main "iinject" task for the plugin.
  */
 public class IInjectorTask extends AbstractTask {
+
+    private static final String OUTPUT_SUFFIX = "-iinjected";
+
+    private File config;
+    private File inputJar;
+    private File outputJar;
+
+    public IInjectorTask() {
+        doLast(new IInjectorAction());
+    }
+
+    @InputFile
+    public File getConfig() {
+        return config;
+    }
+
+    @InputFile
+    public File getInputJar() {
+        return inputJar;
+    }
+
+    @OutputFile
+    public File getOutputJar() {
+        return outputJar;
+    }
+
+    public void setConfig(File configFile) {
+        this.config = configFile;
+    }
+
+    public void setInputJar(File inputFile) {
+        this.inputJar = inputFile;
+        if (outputJar == null) {
+            outputJar = new File(inputJar.getPath().replace(".jar", OUTPUT_SUFFIX + ".jar"));
+        }
+    }
+
 }

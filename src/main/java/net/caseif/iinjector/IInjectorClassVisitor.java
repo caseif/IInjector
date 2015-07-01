@@ -28,19 +28,32 @@
  */
 package net.caseif.iinjector;
 
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
-/**
- * The main class for the IInjector plugin.
- */
-public class IInjectorPlugin implements Plugin<Project> {
+public class IInjectorClassVisitor extends ClassVisitor {
 
-    @Override
-    public void apply(final Project project) {
-        project.getTasks().create("iinject", IInjectorTask.class);
+    private final ClassWriter writer;
+
+    private final Set<String> interfaces;
+
+    public IInjectorClassVisitor(ClassWriter classWriter, Set<String> interfaces) {
+        super(Opcodes.ASM5, classWriter);
+        this.writer = classWriter;
+        this.interfaces = interfaces;
     }
 
+    @Override
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        ArrayList<String> newInterfaces = new ArrayList<>();
+        newInterfaces.addAll(Arrays.asList(interfaces));
+        newInterfaces.addAll(this.interfaces);
+        writer.visit(version, access, name, signature, superName, (String[])newInterfaces.toArray());
+    }
 }
