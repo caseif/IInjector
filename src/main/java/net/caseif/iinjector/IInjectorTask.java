@@ -28,18 +28,18 @@
  */
 package net.caseif.iinjector;
 
-import org.gradle.api.internal.AbstractTask;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
+import org.gradle.jvm.tasks.Jar;
 
 import java.io.File;
 
 /**
  * The main "iinject" task for the plugin.
  */
-public class IInjectorTask extends AbstractTask {
+public class IInjectorTask extends Jar {
 
-    private String classifier = "-iinjected";
+    private String suffix = "-iinjected";
 
     private File config;
     private File inputJar;
@@ -72,8 +72,8 @@ public class IInjectorTask extends AbstractTask {
         this.inputJar = inputFile;
     }
 
-    public String getClassifier() {
-        return this.classifier;
+    public String getSuffix() {
+        return this.suffix;
     }
 
 }

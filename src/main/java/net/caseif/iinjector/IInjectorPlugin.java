@@ -31,8 +31,6 @@ package net.caseif.iinjector;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-import java.io.File;
-
 /**
  * The main class for the IInjector plugin.
  */
