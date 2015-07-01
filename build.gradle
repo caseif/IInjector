@@ -17,7 +17,7 @@ plugins {
 
 apply plugin: 'license'
 
-group = 'net.caseif.interfaceinjector'
+group = 'net.caseif.iinjector'
 version = '0.1.0-SNAPSHOT'
 
 ext.projectName = 'iinjector'
