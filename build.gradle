@@ -1,0 +1,110 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'maven'
+    id 'eclipse'
+    id 'idea'
+    id 'checkstyle'
+}
+
+apply plugin: 'license'
+
+group = 'net.caseif.interfaceinjector'
+version = '0.1.0-SNAPSHOT'
+
+ext.projectName = 'iinjector'
+ext.description = 'A Gradle plugin enabling compile-time injection of interfaces into Java class bytecode.'
+ext.inceptionYear = '2015'
+ext.packaging = 'jar'
+ext.author = 'Max Roncacé'
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+configurations {
+    deployerJars
+}
+
+defaultTasks 'clean', 'licenseFormat', 'build', 'install'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    runtime 'org.ow2.asm:asm:5.0.3'
+
+    deployerJars 'org.apache.maven.wagon:wagon-ssh:2.8'
+}
+
+license {
+    header file('LICENSE')
+    sourceSets = project.sourceSets
+    ignoreFailures false
+    strictCheck true
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+    exclude('**/*.properties')
+}
+
+checkstyle {
+    configProperties = [
+            'name'        : project.name,
+            'year'        : project.inceptionYear
+    ]
+    configFile = file('etc/checkstyle.xml')
+}
+
+jar.manifest.mainAttributes(
+        'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+        'Implementation-Title': name,
+        'Implementation-Version': version,
+        'Implementation-Vendor': author
+)
+
+uploadArchives {
+    repositories.mavenDeployer {
+        setUniqueVersion(true)
+        configuration = configurations.deployerJars
+        if (project.hasProperty('mavenRepo')) {
+            repository(url: project.property('mavenRepo')) {
+                authentication(userName: project.property('mavenUser'), password: project.property('mavenPass'))
+            }
+        }
+
+        pom {
+            groupId = project.group
+            version = project.version
+            artifactId = project.ext.projectName
+            project {
+                packaging 'jar'
+                description project.ext.description
+                url 'http://github.com/caseif/IInjector'
+
+                scm {
+                    url 'https://github.com/caseif/IInjector'
+                    connection 'scm:git:git://github.com/caseif/IInjector.git'
+                    developerConnection 'scm:git:git@github.com:caseif/IInjector.git'
+                }
+
+                licenses {
+                    license {
+                        name 'BSD 3-Clause'
+                        url 'http://opensource.org/licenses/BSD-3-clause'
+                        distribution 'repo'
+                    }
+                }
+            }
+        }
+    }
+}
