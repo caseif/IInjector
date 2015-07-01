@@ -8,9 +8,12 @@ build.gradle:
 
 ```
 iinject {
-    inputJar = jar.getArchivePath() // required
-    config = file('iinject.txt') // required
-    outputFileName = jar.getBaseName() + '-iinjected' // optional, defaults to this if classifier is not set
+    inputJar jar.getArchivePath()
+    // alternatively, an archive task may be supplied as input instead (this will always override inputJar):
+    // inputTask jar
+    config file('iinject.txt') // required
+    outputJarName jar.getBaseName() + '-' + jar.getVersion() + '-iinjected.jar' // optional, defaults to this if classifier is not set (overrides classifier)
+    
 }
 ```
 

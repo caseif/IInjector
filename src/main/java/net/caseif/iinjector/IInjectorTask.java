@@ -28,21 +28,27 @@
  */
 package net.caseif.iinjector;
 
+import org.gradle.api.Task;
+import org.gradle.api.internal.AbstractTask;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.bundling.AbstractArchiveTask;
 import org.gradle.jvm.tasks.Jar;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * The main "iinject" task for the plugin.
  */
-public class IInjectorTask extends Jar {
+public class IInjectorTask extends AbstractTask {
 
     private File config;
-    private File inputJar;
-    @Optional String outputFileName;
+    @InputFile @Optional private File inputJar;
+    private AbstractArchiveTask inputTask;
+    private String outputJarName;
+    private String classifier = "-iinjected";
 
     public IInjectorTask() {
         doLast(new IInjectorAction());
@@ -53,30 +59,61 @@ public class IInjectorTask extends Jar {
         return config;
     }
 
-    @InputFile
-    public File getInputJar() {
-        return inputJar;
-    }
-
-    @OutputFile
-    public File getOutputJar() {
-        return new File(
-                outputFileName != null
-                ? outputFileName
-                : getInputJar().getPath()
-                        .replace(".jar", "" + (getClassifier() != null
-                                ? (!getClassifier().isEmpty() ? "-" : "") + getClassifier()
-                                : "-iinject"
-                        ) + ".jar")
-        );
-    }
-
-    public void setConfig(File configFile) {
+    public void config(File configFile) {
         this.config = configFile;
     }
 
-    public void setInputJar(File inputFile) {
+    public File getInputJar() {
+        File input = inputTask != null ? inputTask.getArchivePath() : inputJar;
+        if (input == null) {
+            throw new IllegalArgumentException("Either inputTask or inputJar must be supplied!");
+        }
+        return input;
+    }
+
+    public void inputJar(File inputFile) {
         this.inputJar = inputFile;
+    }
+
+    public Task getInputTask() {
+        return inputTask;
+    }
+
+    public void inputTask(AbstractArchiveTask task) {
+        this.inputTask = task;
+    }
+
+    public String getOutputJarName() {
+        return outputJarName;
+    }
+
+    public void outputJarName(String output) {
+        this.outputJarName = output;
+    }
+
+    public String getClassifier() {
+        return this.classifier;
+    }
+
+    public void classifier(String classifier) {
+        this.classifier = classifier;
+    }
+
+    File getOutputJar() {
+        String realClassifier = (!getClassifier().isEmpty() ? "-" : "") + getClassifier();
+        AbstractArchiveTask archiveTask;
+        if (inputTask != null) {
+            archiveTask = inputTask;
+        } else {
+            Set<Task> tasks = getProject().getTasksByName("jar", false);
+            archiveTask = tasks.size() > 0 ? (AbstractArchiveTask)tasks.toArray()[0] : null;
+        }
+        return new File(getInputJar().getParent(), outputJarName != null
+                ? outputJarName + (!outputJarName.endsWith(".jar") ? ".jar" : "")
+                : (archiveTask != null
+                        ? archiveTask.getArchiveName().replace("-" + archiveTask.getClassifier(), "") + realClassifier
+                        : getInputJar().getName().replace(".jar", "" + realClassifier + ".jar"))
+        );
     }
 
 }
