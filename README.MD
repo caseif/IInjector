@@ -10,7 +10,7 @@ build.gradle:
 iinject {
     inputJar = jar.getArchivePath() // required
     config = file('iinject.txt') // required
-    outputJarName = jar.getBaseName() + '-iinjected' // optional, defaults to this if classifier is not set
+    outputFileName = jar.getBaseName() + '-iinjected' // optional, defaults to this if classifier is not set
 }
 ```
 
